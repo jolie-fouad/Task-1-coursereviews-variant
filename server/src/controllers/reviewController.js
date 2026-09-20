@@ -73,6 +73,9 @@ export async function createReview(req, res, next) {
     const { value, error } = createSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.message });
 
+    const existing = await Review.findOne({ courseCode: value.courseCode, reviewedBy: value.reviewedBy });
+    if (existing) return res.status(409).json({ message: 'You have already reviewed this course' });
+
     const review = await Review.create(value);
     res.status(201).json({ review });
   } catch (err) {
